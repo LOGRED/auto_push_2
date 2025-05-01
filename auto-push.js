@@ -4,7 +4,7 @@ import { copy } from 'fs-extra';
 
 const git = simpleGit();
 
-const detectFolder = `/Users/seonghyeoning/Documents/감시당하는 폴더`
+const detectFolder = 'C:/Users/sihan/OneDrive/문서/마음렌즈/Maumlenz/database/vision'
 
 const watcher = chokidar.watch(detectFolder, {
     ignored: ['.git/**', 'node_modules/**'],
