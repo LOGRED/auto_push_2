@@ -1,34 +1,50 @@
 import chokidar from 'chokidar';
 import simpleGit from 'simple-git';
-import { copy } from 'fs-extra';
+import fs from 'fs';
+import { join, dirname, sep } from 'path';
+import { mkdirSync, copyFileSync } from 'fs';
 
 const git = simpleGit();
 
-const detectFolder = 'C:/Users/sihan/OneDrive/문서/마음렌즈/Maumlenz/database/vision'
+const detectFolder = 'C:/Users/sihan/OneDrive/문서/마음렌즈/Maumlenz/database/vision';
 
 const watcher = chokidar.watch(detectFolder, {
     ignored: ['.git/**', 'node_modules/**'],
     ignoreInitial: true
 });
 
-watcher.on('addDir', async (path) => {
-    console.log(`Detected ${path}, running git commands…`);
+watcher.on('change', async (path) => {
+    if(path.endsWith('.xlsm')) {
+        console.log(path.split(sep).pop());
 
-    console.log(path)
+        try {
+            // Create the destination path
+            const destPath = join(process.cwd(), 'results', path.split(sep).pop());
+            
+            // Ensure the destination directory exists
+            const destDir = join(process.cwd(), 'results');
+            if (!fs.existsSync(destDir)) {
+                fs.mkdirSync(destDir, { recursive: true });
+            }
+            
+            // Copy the file
+            fs.copyFileSync(path, destPath);
+            console.log(`✅ Copied successfully to: ${destPath}`);
 
-    try {
-        copy(path, './results')
-        console.log("✅ Copied successfully")
-    } catch (err) {
-        console.error('❌ Copy operation failed!:', err);
+            try {
+                await git.add('.');
+                await git.commit(`Auto commit: ${new Date().toISOString()}`);
+                await git.push('origin', 'main');
+                console.log('✅ Pushed successfully');
+            } catch (err) {
+                console.error('❌ Git operation failed:', err);
+            }
+        } catch (err) {
+            console.error('❌ Copy operation failed!:', err);
+        }
+
+
     }
+    // console.log(path)
 
-    try {
-        await git.add('.');
-        await git.commit(`Auto commit: ${new Date().toISOString()}`);
-        await git.push('origin', 'main');
-        console.log('✅ Pushed successfully');
-    } catch (err) {
-        console.error('❌ Git operation failed:', err);
-    }
 });
