@@ -20,7 +20,7 @@ watcher.on('addDir', async (path) => {
         copy(path, './results')
         console.log("✅ Copied successfully")
     } catch (err) {
-        console.error('❌ Copy operation failed:', err);
+        console.error('❌ Copy operation failed!:', err);
     }
 
     try {
