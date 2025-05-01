@@ -1,5 +1,6 @@
 import chokidar from 'chokidar';
 import simpleGit from 'simple-git';
+import { copy } from 'fs-extra';
 
 const git = simpleGit();
 
@@ -10,8 +11,18 @@ const watcher = chokidar.watch(detectFolder, {
     ignoreInitial: true
 });
 
-watcher.on('addDir', async (event, path) => {
-    console.log(`Detected ${event} on ${path}, running git commands…`);
+watcher.on('addDir', async (path) => {
+    console.log(`Detected ${path}, running git commands…`);
+
+    console.log(path)
+
+    try {
+        copy(path, './results')
+        console.log("✅ Copied successfully")
+    } catch (err) {
+        console.error('❌ Copy operation failed:', err);
+    }
+
     try {
         await git.add('.');
         await git.commit(`Auto commit: ${new Date().toISOString()}`);
