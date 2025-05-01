@@ -2,7 +2,10 @@ import chokidar from 'chokidar';
 import simpleGit from 'simple-git';
 
 const git = simpleGit();
-const watcher = chokidar.watch('.', {
+
+const detectFolder = `/Users/seonghyeoning/Documents/감시당하는 폴더`
+
+const watcher = chokidar.watch(detectFolder, {
     ignored: ['.git/**', 'node_modules/**'],
     ignoreInitial: true
 });
