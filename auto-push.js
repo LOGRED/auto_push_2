@@ -18,20 +18,18 @@ watcher.on('change', async (path) => {
         console.log(path.split(sep).pop());
 
         try {
-            // Create the destination path
             const destPath = join(process.cwd(), 'results', path.split(sep).pop());
             
-            // Ensure the destination directory exists
             const destDir = join(process.cwd(), 'results');
             if (!fs.existsSync(destDir)) {
                 fs.mkdirSync(destDir, { recursive: true });
             }
             
-            // Copy the file
             fs.copyFileSync(path, destPath);
             console.log(`✅ Copied successfully to: ${destPath}`);
 
             try {
+                await git.pull('origin', 'main');
                 await git.add('.');
                 await git.commit(`Auto commit: ${new Date().toISOString()}`);
                 await git.push('origin', 'main');
@@ -42,9 +40,5 @@ watcher.on('change', async (path) => {
         } catch (err) {
             console.error('❌ Copy operation failed!:', err);
         }
-
-
     }
-    // console.log(path)
-
 });
